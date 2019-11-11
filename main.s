@@ -159,5 +159,11 @@ initSnes:
     ; 4209-420A contain vblank timer setting
     ; These are left alone, but need to be set if either is enabled
 
-    ; TODO
+    stz $420B       ; Turn off all DMA channels
+    stz $420C       ; Turn off all HDMA channels
+    stz $420D       ; 120ns or slower EPROM
+
+    ; Omitting an lda from $4210 here
+
+    ; todo
     rts
