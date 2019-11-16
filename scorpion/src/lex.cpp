@@ -20,6 +20,7 @@ namespace Scorpion {
 		std::variant< Token, std::string > result;
 
 		Token token;
+		token.position = position;
 		switch( hash( text.c_str() ) ) {
 			case hash( "def" ): {
 				token.type = TokenType::Define;
@@ -161,7 +162,7 @@ namespace Scorpion {
 					// Don't ignore the token if it was an \n!
 					if( next == '\n' ) {
 						// Push the \n
-						tokens.push( Token{ TokenType::Newline, {} } );
+						tokens.push( Token{ TokenType::Newline, position, {} } );
 					}
 					break;
 				}

@@ -1,4 +1,5 @@
 #pragma once
+#include "utility.hpp"
 #include <optional>
 #include <string>
 #include <variant>
@@ -6,6 +7,7 @@
 namespace Scorpion {
 
 	enum class TokenType {
+		None,
 		Define,
 		Symbol,
 		As,
@@ -29,6 +31,7 @@ namespace Scorpion {
 
 	struct Token {
 		TokenType type;
+		FilePosition position;
 		std::optional< std::variant< std::string, long, double > > value;
 	};
 
