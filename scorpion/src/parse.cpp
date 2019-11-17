@@ -35,26 +35,6 @@ namespace Scorpion {
 		return copy;
 	}
 
-	void printExpressionStatement( const ExpressionStatement& statement ) {
-		std::visit( overloaded {
-			[]( const AssignmentExpression& expression ) {
-
-			},
-			[]( const UnaryExpression& expression ) {
-
-			},
-			[]( const BinaryExpression& expression ) {
-
-			},
-			[]( const GroupExpression& expression ) {
-
-			},
-			[]( const Literal& literal ) {
-
-			}
-		}, statement );
-	}
-
 	std::optional< Expression > getPrimary( std::queue< Token >& tokens ) {
 		if( tokens.front().type == TokenType::NumericLiteral ||
 			tokens.front().type == TokenType::DecimalLiteral ||
@@ -335,15 +315,9 @@ namespace Scorpion {
 	}
 
 	void printTree( const Program& program ) {
-		for( const Declaration& statement : program ) {
-			std::visit( overloaded {
-				[]( const ExpressionStatement& statement ) {
-
-				},
-				[]( const DefineStatement& statement ) {
-
-				}
-			}, statement );
+		std::cout << "Tree:" << std::endl;
+		for( const Declaration& declaration : program ) {
+			std::cout << toString( declaration ) << std::endl;
 		}
 	}
 

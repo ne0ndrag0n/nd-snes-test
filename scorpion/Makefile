@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Wextra -std=c++17 -g #-fsanitize=address
+CFLAGS = -Wall -Wextra -Wpedantic -std=c++17 -g #-fsanitize=address
 INCLUDES = -Iinclude -Ilib
 LIBS =
 

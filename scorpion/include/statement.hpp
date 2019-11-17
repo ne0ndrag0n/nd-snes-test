@@ -2,6 +2,7 @@
 #include "expression.hpp"
 #include <vector>
 #include <variant>
+#include <string>
 
 namespace Scorpion {
 
@@ -15,5 +16,7 @@ namespace Scorpion {
 
 	using Declaration = std::variant< ExpressionStatement, DefineStatement >;
 	using Program = std::vector< Declaration >;
+
+	std::string toString( const Declaration& declaration );
 
 }

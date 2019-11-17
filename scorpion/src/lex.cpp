@@ -213,24 +213,7 @@ namespace Scorpion {
 		while( !tokens.empty() ) {
 			const Token& token = tokens.front();
 
-			switch( token.type ) {
-				case TokenType::Symbol:
-					output += "TokenType::Symbol(" + std::get< std::string >( *token.value ) + ")";
-					break;
-				case TokenType::NumericLiteral:
-					output += "TokenType::NumericLiteral(" + std::to_string( std::get< long >( *token.value ) ) + ")";
-					break;
-				case TokenType::DecimalLiteral:
-					output += "TokenType::DecimalLiteral(" + std::to_string( std::get< double >( *token.value ) ) + ")";
-					break;
-				case TokenType::StringLiteral:
-					output += "TokenType::StringLiteral(" + std::get< std::string >( *token.value ) + ")";
-					break;
-				default:
-					output += getTypeString( token );
-			}
-
-			output += "\n";
+			output += toString( token ) + "\n";
 
 			tokens.pop();
 		}

@@ -37,4 +37,5 @@ namespace Scorpion {
         Token literalToken;
     };
 
+    std::string toString( const Expression& expression );
 }
