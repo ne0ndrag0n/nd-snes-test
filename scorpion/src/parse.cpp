@@ -1,4 +1,5 @@
 #include "expression.hpp"
+#include "statement.hpp"
 #include "token.hpp"
 #include <optional>
 #include <queue>
@@ -6,12 +7,10 @@
 namespace Scorpion {
 
 	// program         -> declaration*
-	// declaration     -> definestatement | statement
+	// declaration     -> definestatement | expressionStmt
 
 	// definestatement -> Define Symbol As typeid ( "=" expression )? Newline
-
-	// statement       -> expressionStmt
-	// expressionStmt  -> expression Newline
+	// expressionStmt  -> expression? Newline
 
 	// expression      -> assignment
 	// assignment      -> ( Symbol Equals assignment ) | equality
@@ -25,6 +24,8 @@ namespace Scorpion {
 
 	// typeid          -> Symbol | ( TypeU8 | TypeS8 | ... )
 
+	std::optional< Expression > getExpression( std::queue< Token >& tokens );
+
 	Token takeAndPop( std::queue< Token >& tokens ) {
 		Token copy = tokens.front();
 		tokens.pop();
@@ -37,16 +38,20 @@ namespace Scorpion {
 			tokens.front().type == TokenType::StringLiteral ||
 			tokens.front().type == TokenType::False ||
 			tokens.front().type == TokenType::True ||
-			tokens.front().type == TokenType::Null
+			tokens.front().type == TokenType::Null ||
+			tokens.front().type == TokenType::Symbol
 		) {
 			return Expression{ Literal{ takeAndPop( tokens ) } };
 		}
 
-		/*
 		if( tokens.front().type == TokenType::LeftParen ) {
+			// Eat leftparen
+			tokens.pop();
 			std::optional< Expression > expression = getExpression( tokens );
 			if( expression ) {
 				if( tokens.front().type == TokenType::RightParen ) {
+					// Eat rightparen
+					tokens.pop();
 					return expression;
 				} else {
 					// Expected: right paren
@@ -57,7 +62,6 @@ namespace Scorpion {
 				return {};
 			}
 		}
-		*/
 
 		// Can't return a primary
 		return {};
@@ -208,6 +212,77 @@ namespace Scorpion {
 			}
 		} else {
 			return getEquality( tokens );
+		}
+	}
+
+	std::optional< Expression > getExpression( std::queue< Token >& tokens ) {
+		return getAssignment( tokens );
+	}
+
+	std::optional< ExpressionStatement > getExpressionStmt( std::queue< Token >& tokens ) {
+		std::optional< Expression > expression = getExpression( tokens );
+
+		if( tokens.front().type != TokenType::Newline ) {
+			// Expected: newline
+			return {};
+		} else {
+			tokens.pop();
+			return expression;
+		}
+	}
+
+	std::optional< DefineStatement > getDefineStatement( std::queue< Token >& tokens ) {
+		if( tokens.front().type == TokenType::Define ) {
+			tokens.pop();
+			if( tokens.front().type == TokenType::Symbol ) {
+				Token symbol = takeAndPop( tokens );
+				if( tokens.front().type == TokenType::As ) {
+					tokens.pop();
+					if( tokens.front().type == TokenType::Symbol ||
+						tokens.front().type == TokenType::TypeU8 ||
+						tokens.front().type == TokenType::TypeU16 ||
+						tokens.front().type == TokenType::TypeU32 ||
+						tokens.front().type == TokenType::TypeS8 ||
+						tokens.front().type == TokenType::TypeS16 ||
+						tokens.front().type == TokenType::TypeS32 ||
+						tokens.front().type == TokenType::TypeReal ||
+						tokens.front().type == TokenType::TypeString ||
+						tokens.front().type == TokenType::TypeBoolean
+					) {
+						Token type = takeAndPop( tokens );
+
+						if( tokens.front().type == TokenType::Equals ) {
+							// Assignment expression
+							tokens.pop();
+							std::optional< Expression > expression = getExpression( tokens );
+							if( expression ) {
+								return DefineStatement{
+									symbol,
+									type,
+									std::make_unique< Expression >( std::move( *expression ) )
+								};
+							} else {
+								// Expected: expression
+								return {};
+							}
+						} else {
+							// Default init
+							return DefineStatement{ symbol, type, nullptr };
+						}
+					} else {
+						// Expected: type
+						return {};
+					}
+				} else {
+					// Expected: as
+					return {};
+				}
+			} else {
+				// Expected: symbol
+				return {};
+			}
+		} else {
+			return {};
 		}
 	}
 
