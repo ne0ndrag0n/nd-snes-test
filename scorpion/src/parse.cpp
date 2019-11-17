@@ -13,16 +13,17 @@ namespace Scorpion {
 	// statement       -> expressionStmt
 	// expressionStmt  -> expression Newline
 
-	// expression      -> equality
+	// expression      -> assignment
+	// assignment      -> ( Symbol Equals assignment ) | equality
 	// equality        -> comparison ( ( "!=" | "==" ) comparison )*
 	// comparison      -> addition ( ( ">" | ">=" | "<" | "<=" ) addition )*
 	// addition        -> multiplication ( ( "+" | "-" ) multiplication )*
 	// multiplication  -> unary ( ( "/" | "*" ) unary )*
 	// unary           -> ( ( Not | "-" ) unary ) | primary
 	// primary         -> NumericLiteral | DecimalLiteral | StringLiteral
-	//					  | False | True | Null | "(" expression ")"
+	//					  | False | True | Null | Symbol | "(" expression ")"
 
-	// typeid          -> symbol | ( TypeU8 | TypeS8 | ... )
+	// typeid          -> Symbol | ( TypeU8 | TypeS8 | ... )
 
 	Token takeAndPop( std::queue< Token >& tokens ) {
 		Token copy = tokens.front();
@@ -183,6 +184,30 @@ namespace Scorpion {
 			}
 		} else {
 			return lhs;
+		}
+	}
+
+	std::optional< Expression > getAssignment( std::queue< Token >& tokens ) {
+		if( tokens.front().type == TokenType::Symbol ) {
+			Token symbol = takeAndPop( tokens );
+			if( tokens.front().type == TokenType::Equals ) {
+				tokens.pop();	// Eat the equals, we just need to see if it's there
+				std::optional< Expression > rhs = getAssignment( tokens );
+				if( rhs ) {
+					return AssignmentExpression{
+						symbol,
+						std::make_unique< Expression >( std::move( *rhs ) )
+					};
+				} else {
+					// Expected: assignment
+					return {};
+				}
+			} else {
+				// Expected: equals
+				return {};
+			}
+		} else {
+			return getEquality( tokens );
 		}
 	}
 

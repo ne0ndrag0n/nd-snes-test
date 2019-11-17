@@ -6,11 +6,17 @@
 namespace Scorpion {
 
     using Expression = std::variant<
+        struct AssignmentExpression,
         struct UnaryExpression,
         struct BinaryExpression,
         struct GroupExpression,
         struct Literal
     >;
+
+    struct AssignmentExpression {
+        Token symbol;
+        std::unique_ptr< Expression > expression;
+    };
 
     struct UnaryExpression {
         std::unique_ptr< Expression > expression;
