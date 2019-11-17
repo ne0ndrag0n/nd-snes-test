@@ -34,6 +34,30 @@ namespace Scorpion {
 				token.type = TokenType::Dot;
 				break;
 			}
+			case hash( ">" ): {
+				token.type = TokenType::GreaterThan;
+				break;
+			}
+			case hash( ">=" ): {
+				token.type = TokenType::GreaterThanEqual;
+				break;
+			}
+			case hash( "<" ): {
+				token.type = TokenType::LessThan;
+				break;
+			}
+			case hash( "<=" ): {
+				token.type = TokenType::LessThanEqual;
+				break;
+			}
+			case hash( "==" ): {
+				token.type = TokenType::EqualTo;
+				break;
+			}
+			case hash( "!=" ): {
+				token.type = TokenType::NotEqualTo;
+				break;
+			}
 			case hash( "=" ): {
 				token.type = TokenType::Equals;
 				break;

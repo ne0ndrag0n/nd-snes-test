@@ -26,6 +26,18 @@ namespace Scorpion {
 		TypeU8,
 		TypeU16,
 		TypeU32,
+		False,
+		True,
+		Null,
+		And,
+		Or,
+		Not,
+		GreaterThan,
+		GreaterThanEqual,
+		LessThan,
+		LessThanEqual,
+		EqualTo,
+		NotEqualTo,
 		Newline
 	};
 
