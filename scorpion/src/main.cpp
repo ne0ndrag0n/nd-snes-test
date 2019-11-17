@@ -1,5 +1,6 @@
 #include "lex.hpp"
 #include "utility.hpp"
+#include "parse.hpp"
 #include <rang.hpp>
 #include <iostream>
 

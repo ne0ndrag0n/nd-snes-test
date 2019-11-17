@@ -1,7 +1,10 @@
 #include "expression.hpp"
 #include "statement.hpp"
 #include "token.hpp"
+#include "utility.hpp"
+#include <iostream>
 #include <optional>
+#include <variant>
 #include <queue>
 
 namespace Scorpion {
@@ -30,6 +33,26 @@ namespace Scorpion {
 		Token copy = tokens.front();
 		tokens.pop();
 		return copy;
+	}
+
+	void printExpressionStatement( const ExpressionStatement& statement ) {
+		std::visit( overloaded {
+			[]( const AssignmentExpression& expression ) {
+
+			},
+			[]( const UnaryExpression& expression ) {
+
+			},
+			[]( const BinaryExpression& expression ) {
+
+			},
+			[]( const GroupExpression& expression ) {
+
+			},
+			[]( const Literal& literal ) {
+
+			}
+		}, statement );
 	}
 
 	std::optional< Expression > getPrimary( std::queue< Token >& tokens ) {
@@ -219,7 +242,7 @@ namespace Scorpion {
 		return getAssignment( tokens );
 	}
 
-	std::optional< ExpressionStatement > getExpressionStmt( std::queue< Token >& tokens ) {
+	std::optional< ExpressionStatement > getExpressionStatement( std::queue< Token >& tokens ) {
 		std::optional< Expression > expression = getExpression( tokens );
 
 		if( tokens.front().type != TokenType::Newline ) {
@@ -283,6 +306,44 @@ namespace Scorpion {
 			}
 		} else {
 			return {};
+		}
+	}
+
+	std::optional< Declaration > getDeclaration( std::queue< Token >& tokens ) {
+		// One-token lookahead
+		if( tokens.front().type == TokenType::Define ) {
+			return getDefineStatement( tokens );
+		} else {
+			return getExpressionStatement( tokens );
+		}
+	}
+
+	std::optional< Program > getProgram( std::queue< Token >& tokens ) {
+		Program program;
+
+		while( !tokens.empty() ) {
+			std::optional< Declaration > declaration = getDeclaration( tokens );
+			if( declaration ) {
+				program.emplace_back( std::move( *declaration ) );
+			} else {
+				// Expected: declaration
+				return {};
+			}
+		}
+
+		return std::move( program );
+	}
+
+	void printTree( const Program& program ) {
+		for( const Declaration& statement : program ) {
+			std::visit( overloaded {
+				[]( const ExpressionStatement& statement ) {
+
+				},
+				[]( const DefineStatement& statement ) {
+
+				}
+			}, statement );
 		}
 	}
 

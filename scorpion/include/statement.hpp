@@ -13,6 +13,7 @@ namespace Scorpion {
 		std::unique_ptr< Expression > expression;
 	};
 
-	using Program = std::vector< std::variant< ExpressionStatement, DefineStatement > >;
+	using Declaration = std::variant< ExpressionStatement, DefineStatement >;
+	using Program = std::vector< Declaration >;
 
 }

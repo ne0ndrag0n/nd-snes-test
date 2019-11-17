@@ -214,41 +214,8 @@ namespace Scorpion {
 			const Token& token = tokens.front();
 
 			switch( token.type ) {
-				case TokenType::Define:
-					output += "TokenType::Define";
-					break;
 				case TokenType::Symbol:
 					output += "TokenType::Symbol(" + std::get< std::string >( *token.value ) + ")";
-					break;
-				case TokenType::As:
-					output += "TokenType::As";
-					break;
-				case TokenType::Dot:
-					output += "TokenType::Dot";
-					break;
-				case TokenType::Plus:
-					output += "TokenType::Plus";
-					break;
-				case TokenType::Minus:
-					output += "TokenType::Minus";
-					break;
-				case TokenType::Asterisk:
-					output += "TokenType::Asterisk";
-					break;
-				case TokenType::ForwardSlash:
-					output += "TokenType::ForwardSlash";
-					break;
-				case TokenType::BackwardSlash:
-					output += "TokenType::BackwardSlash";
-					break;
-				case TokenType::Equals:
-					output += "TokenType::Equals";
-					break;
-				case TokenType::LeftParen:
-					output += "TokenType::LeftParen";
-					break;
-				case TokenType::RightParen:
-					output += "TokenType::RightParen";
 					break;
 				case TokenType::NumericLiteral:
 					output += "TokenType::NumericLiteral(" + std::to_string( std::get< long >( *token.value ) ) + ")";
@@ -259,21 +226,8 @@ namespace Scorpion {
 				case TokenType::StringLiteral:
 					output += "TokenType::StringLiteral(" + std::get< std::string >( *token.value ) + ")";
 					break;
-				case TokenType::TypeU8:
-					output += "TokenType::TypeU8";
-					break;
-				case TokenType::TypeU16:
-					output += "TokenType::TypeU16";
-					break;
-				case TokenType::TypeU32:
-					output += "TokenType::TypeU32";
-					break;
-				case TokenType::Newline:
-					output += "TokenType::Newline";
-					break;
 				default:
-					output += "Invalid/Unknown token";
-					break;
+					output += getTypeString( token );
 			}
 
 			output += "\n";

@@ -53,4 +53,6 @@ namespace Scorpion {
 		std::optional< std::variant< std::string, long, double > > value;
 	};
 
+	const char* getTypeString( const Token& token );
+
 }
