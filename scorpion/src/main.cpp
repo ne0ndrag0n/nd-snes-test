@@ -3,6 +3,7 @@
 #include "parse.hpp"
 #include <rang.hpp>
 #include <iostream>
+#include <variant>
 
 void printHelp() {
 	std::cout << std::endl;
@@ -86,14 +87,24 @@ int main( int argumentCount, char** arguments ) {
 	if( paths.size() ) {
 		for( const std::string& path : paths ) {
 			auto result = Scorpion::getTokens( path );
-			std::visit( overloaded {
-				[]( std::queue< Scorpion::Token > tokens ) {
-					Scorpion::printTokens( tokens );
-				},
-				[]( std::string error ) {
-					std::cout << error << std::endl;
+
+			if( std::holds_alternative< std::queue< Scorpion::Token > >( result ) ) {
+				auto tokens = std::get< std::queue< Scorpion::Token > >( result );
+				Scorpion::printTokens( tokens );
+
+				auto parseResult = Scorpion::compile( tokens );
+				if( std::holds_alternative< Scorpion::Program >( parseResult ) ) {
+					std::cout << "Compiled successfully." << std::endl;
+				} else {
+					auto errors = std::get< std::stack< std::string > >( parseResult );
+					while( !errors.empty() ) {
+						std::cout << errors.top() << std::endl;
+						errors.pop();
+					}
 				}
-			}, result );
+			} else {
+				std::cout << std::get< std::string >( result ) << std::endl;
+			}
 		}
 	}
 

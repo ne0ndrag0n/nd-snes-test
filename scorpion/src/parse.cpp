@@ -6,6 +6,7 @@
 #include <optional>
 #include <variant>
 #include <queue>
+#include <stack>
 
 namespace Scorpion {
 
@@ -26,6 +27,14 @@ namespace Scorpion {
 	//					  | False | True | Null | Symbol | "(" expression ")"
 
 	// typeid          -> Symbol | ( TypeU8 | TypeS8 | ... )
+
+	static std::stack< std::string > currentErrors;
+
+	void logError( const FilePosition& position, const std::string& message ) {
+		std::string base = "At " + std::to_string( position.row ) + ", " + std::to_string( position.column ) + ": ";
+
+		currentErrors.push( base + message );
+	}
 
 	std::optional< Expression > getExpression( std::queue< Token >& tokens );
 
@@ -58,15 +67,18 @@ namespace Scorpion {
 					return expression;
 				} else {
 					// Expected: right paren
+					logError( tokens.front().position, "expected: right paren" );
 					return {};
 				}
 			} else {
 				// Expected: expression
+				logError( tokens.front().position, "expected: expression" );
 				return {};
 			}
 		}
 
 		// Can't return a primary
+		logError( tokens.front().position, "did not return a primary expression" );
 		return {};
 	}
 
@@ -81,6 +93,7 @@ namespace Scorpion {
 				};
 			} else {
 				// Expected: unary
+				logError( tokens.front().position, "expected: unary" );
 				return {};
 			}
 		} else {
@@ -107,6 +120,7 @@ namespace Scorpion {
 				};
 			} else {
 				// Expected: unary
+				logError( tokens.front().position, "expected: unary" );
 				return {};
 			}
 		} else {
@@ -133,6 +147,7 @@ namespace Scorpion {
 				};
 			} else {
 				// Expected: multiplication
+				logError( tokens.front().position, "expected: multiplication" );
 				return {};
 			}
 		} else {
@@ -161,6 +176,7 @@ namespace Scorpion {
 				};
 			} else {
 				// Expected: addition
+				logError( tokens.front().position, "expected: addition" );
 				return {};
 			}
 		} else {
@@ -187,6 +203,7 @@ namespace Scorpion {
 				};
 			} else {
 				// Expected: comparison
+				logError( tokens.front().position, "expected: comparison" );
 				return {};
 			}
 		} else {
@@ -207,10 +224,12 @@ namespace Scorpion {
 					};
 				} else {
 					// Expected: assignment
+					logError( tokens.front().position, "expected: assignment" );
 					return {};
 				}
 			} else {
 				// Expected: equals
+				logError( tokens.front().position, "expected: equals" );
 				return {};
 			}
 		} else {
@@ -227,6 +246,7 @@ namespace Scorpion {
 
 		if( tokens.front().type != TokenType::Newline ) {
 			// Expected: newline
+			logError( tokens.front().position, "expected: newline" );
 			return {};
 		} else {
 			tokens.pop();
@@ -266,6 +286,7 @@ namespace Scorpion {
 								};
 							} else {
 								// Expected: expression
+								logError( tokens.front().position, "expected: expression" );
 								return {};
 							}
 						} else {
@@ -274,17 +295,21 @@ namespace Scorpion {
 						}
 					} else {
 						// Expected: type
+						logError( tokens.front().position, "expected: type" );
 						return {};
 					}
 				} else {
 					// Expected: as
+					logError( tokens.front().position, "expected: as" );
 					return {};
 				}
 			} else {
 				// Expected: symbol
+				logError( tokens.front().position, "expected: symbol" );
 				return {};
 			}
 		} else {
+			logError( tokens.front().position, "did not return a define statement" );
 			return {};
 		}
 	}
@@ -307,11 +332,22 @@ namespace Scorpion {
 				program.emplace_back( std::move( *declaration ) );
 			} else {
 				// Expected: declaration
+				logError( tokens.front().position, "expected: declaration" );
 				return {};
 			}
 		}
 
 		return std::move( program );
+	}
+
+	std::variant< Program, std::stack< std::string > > compile( std::queue< Token >& tokens ) {
+		std::optional< Program > program = getProgram( tokens );
+
+		if( program ) {
+			return std::move( *program );
+		} else {
+			return currentErrors;
+		}
 	}
 
 	void printTree( const Program& program ) {
